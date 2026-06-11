@@ -1,0 +1,33 @@
+data:
+  data_dir: "data"
+  validation_fraction: 0.1
+  seed: 42
+  batch_size: 128
+  num_workers: 2
+  augmentation:
+    horizontal_flip_probability: 0.5
+    random_crop_padding: 4
+    rotation_degrees: 8
+    color_jitter_brightness: 0.1
+    color_jitter_contrast: 0.1
+    color_jitter_saturation: 0.1
+    use_color_jitter: false
+
+model:
+  input_channels: 3
+  num_classes: 10
+  conv_channels: [64, 128, 256]
+  hidden_dim: 512
+  dropout: 0.4
+
+training:
+  epochs: 25
+  learning_rate: 0.0007
+  weight_decay: 0.0001
+  device: "auto"
+  log_every_n_steps: 100
+
+artifacts:
+  output_dir: "artifacts"
+  best_model_filename: "best_model.pt"
+  metrics_filename: "metrics.yaml"
