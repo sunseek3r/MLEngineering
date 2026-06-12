@@ -1,0 +1,60 @@
+data:
+  data_dir: "../lab1/data"
+  validation_fraction: 0.1
+  seed: 42
+  batch_size: 128
+  num_workers: 2
+  batch_selection:
+    available_training_batches: [1, 2, 3, 4, 5]
+    num_training_batches: 3
+    num_validation_batches: 2
+    test_batch_names: ["test_batch"]
+    static_test_set: true
+  augmentation:
+    horizontal_flip_probability: 0.5
+    random_crop_padding: 4
+    rotation_degrees: 8
+    color_jitter_brightness: 0.1
+    color_jitter_contrast: 0.1
+    color_jitter_saturation: 0.1
+    use_color_jitter: false
+
+model:
+  input_channels: 3
+  num_classes: 10
+  conv_channels: [64, 128, 256]
+  hidden_dim: 512
+  dropout: 0.4
+
+training:
+  epochs: 25
+  learning_rate: 0.0007
+  weight_decay: 0.0001
+  device: "auto"
+  log_every_n_steps: 100
+
+artifacts:
+  output_dir: "artifacts"
+  best_model_filename: "best_model.pt"
+  metrics_filename: "metrics.yaml"
+
+experiments:
+  enabled: true
+  output_dir: "artifacts/experiments"
+  summary_filename: "comparison_summary.yaml"
+  runs:
+    - name: "train_1_batch"
+      description: "One training batch and two validation batches."
+      available_training_batches: [1, 2, 3, 4, 5]
+      num_training_batches: 1
+      num_validation_batches: 2
+    - name: "train_2_batches"
+      description: "Two training batches and two validation batches."
+      available_training_batches: [1, 2, 3, 4, 5]
+      num_training_batches: 2
+      num_validation_batches: 2
+    - name: "train_3_batches"
+      description: "Three training batches and two validation batches."
+      available_training_batches: [1, 2, 3, 4, 5]
+      num_training_batches: 3
+      num_validation_batches: 2
