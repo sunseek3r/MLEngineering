@@ -1,0 +1,57 @@
+stages:
+  download_data:
+    cmd: ../lab1/.venv/bin/python src/download_data.py
+    deps:
+      - src/download_data.py
+      - src/config.py
+      - src/data.py
+    params:
+      - data.data_dir
+    outs:
+      - datasets/raw/cifar-10-batches-py
+      - datasets/registry/dataset_registry.csv
+
+  train_model:
+    cmd: ../lab1/.venv/bin/python src/train.py
+    deps:
+      - src/train.py
+      - src/config.py
+      - src/data.py
+      - datasets/raw/cifar-10-batches-py
+      - datasets/registry/dataset_registry.csv
+    params:
+      - data.seed
+      - data.batch_size
+      - data.num_workers
+      - data.validation_fraction
+      - data.batch_selection
+      - data.augmentation
+      - model
+      - training
+      - artifacts
+    outs:
+      - artifacts/best_model.pt
+    metrics:
+      - artifacts/metrics.yaml
+
+  evaluate_model:
+    cmd: ../lab1/.venv/bin/python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - src/train.py
+      - src/config.py
+      - src/data.py
+      - datasets/raw/cifar-10-batches-py
+      - artifacts/best_model.pt
+    params:
+      - data.seed
+      - data.batch_size
+      - data.num_workers
+      - data.validation_fraction
+      - data.batch_selection
+      - model.num_classes
+      - training.device
+      - artifacts
+      - evaluation
+    metrics:
+      - artifacts/evaluation.yaml

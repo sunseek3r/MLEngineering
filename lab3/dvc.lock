@@ -1,0 +1,168 @@
+schema: '2.0'
+stages:
+  download_data:
+    cmd: ../lab1/.venv/bin/python src/download_data.py
+    deps:
+    - path: src/config.py
+      hash: md5
+      md5: f4be9c27f71bc4d8d9529fb491fdd6ae
+      size: 6340
+    - path: src/data.py
+      hash: md5
+      md5: 207b6ec61b92b54a3e3d1259982afd8d
+      size: 11296
+    - path: src/download_data.py
+      hash: md5
+      md5: d5ae010fa5b175783e3ed1362ef611a1
+      size: 1891
+    params:
+      params.yaml:
+        data.data_dir: datasets/raw
+    outs:
+    - path: datasets/raw/cifar-10-batches-py
+      hash: md5
+      md5: 2c2c368a819f1df18fd0afa1c052c6c4.dir
+      size: 186214114
+      nfiles: 8
+    - path: datasets/registry/dataset_registry.csv
+      hash: md5
+      md5: 5cd7a926007e859590287a3d4d192bee
+      size: 234
+  train_model:
+    cmd: ../lab1/.venv/bin/python src/train.py
+    deps:
+    - path: datasets/raw/cifar-10-batches-py
+      hash: md5
+      md5: 2c2c368a819f1df18fd0afa1c052c6c4.dir
+      size: 186214114
+      nfiles: 8
+    - path: datasets/registry/dataset_registry.csv
+      hash: md5
+      md5: 5cd7a926007e859590287a3d4d192bee
+      size: 234
+    - path: src/config.py
+      hash: md5
+      md5: f4be9c27f71bc4d8d9529fb491fdd6ae
+      size: 6340
+    - path: src/data.py
+      hash: md5
+      md5: 207b6ec61b92b54a3e3d1259982afd8d
+      size: 11296
+    - path: src/train.py
+      hash: md5
+      md5: 355c61ad0ec9d7c84ccde802d6a5d5a9
+      size: 12538
+    params:
+      params.yaml:
+        artifacts:
+          output_dir: artifacts
+          best_model_filename: best_model.pt
+          metrics_filename: metrics.yaml
+        data.augmentation:
+          horizontal_flip_probability: 0.5
+          random_crop_padding: 4
+          rotation_degrees: 8
+          color_jitter_brightness: 0.1
+          color_jitter_contrast: 0.1
+          color_jitter_saturation: 0.1
+          use_color_jitter: false
+        data.batch_selection:
+          available_training_batches:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          num_training_batches: 3
+          num_validation_batches: 2
+          test_batch_names:
+          - test_batch
+          static_test_set: true
+        data.batch_size: 128
+        data.num_workers: 2
+        data.seed: 42
+        data.validation_fraction: 0.1
+        model:
+          input_channels: 3
+          num_classes: 10
+          conv_channels:
+          - 64
+          - 128
+          - 256
+          hidden_dim: 512
+          dropout: 0.4
+        training:
+          epochs: 25
+          learning_rate: 0.0007
+          weight_decay: 0.0001
+          device: auto
+          log_every_n_steps: 100
+    outs:
+    - path: artifacts/best_model.pt
+      hash: md5
+      md5: ef6d0dbffbedbd8cee8abd3490649e3d
+      size: 2034741
+    - path: artifacts/metrics.yaml
+      hash: md5
+      md5: a48622ea8b98dfa5d27650de92a6e890
+      size: 12706
+  evaluate_model:
+    cmd: ../lab1/.venv/bin/python src/evaluate.py
+    deps:
+    - path: artifacts/best_model.pt
+      hash: md5
+      md5: ef6d0dbffbedbd8cee8abd3490649e3d
+      size: 2034741
+    - path: datasets/raw/cifar-10-batches-py
+      hash: md5
+      md5: 2c2c368a819f1df18fd0afa1c052c6c4.dir
+      size: 186214114
+      nfiles: 8
+    - path: src/config.py
+      hash: md5
+      md5: f4be9c27f71bc4d8d9529fb491fdd6ae
+      size: 6340
+    - path: src/data.py
+      hash: md5
+      md5: 207b6ec61b92b54a3e3d1259982afd8d
+      size: 11296
+    - path: src/evaluate.py
+      hash: md5
+      md5: d50005fb3c037c40f1a55d3bcf2095cb
+      size: 1910
+    - path: src/train.py
+      hash: md5
+      md5: 355c61ad0ec9d7c84ccde802d6a5d5a9
+      size: 12538
+    params:
+      params.yaml:
+        artifacts:
+          output_dir: artifacts
+          best_model_filename: best_model.pt
+          metrics_filename: metrics.yaml
+        data.batch_selection:
+          available_training_batches:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          num_training_batches: 3
+          num_validation_batches: 2
+          test_batch_names:
+          - test_batch
+          static_test_set: true
+        data.batch_size: 128
+        data.num_workers: 2
+        data.seed: 42
+        data.validation_fraction: 0.1
+        evaluation:
+          selected_split: test
+          minimum_f1_threshold: 0.75
+        model.num_classes: 10
+        training.device: auto
+    outs:
+    - path: artifacts/evaluation.yaml
+      hash: md5
+      md5: 9737c2b0ff194f6af613c271a2f51c78
+      size: 315
